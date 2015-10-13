@@ -15,8 +15,26 @@ fi
 if [[ -s "${ZDOTDIR:-$HOME}/.zshrc.local" ]]; then
   source "${ZDOTDIR:-$HOME}/.zshrc.local"
 fi
-export PATH="${HOME}/.local/bin:${PATH}"
-export LD_LIBRARY_PATH="${HOME}/.local/lib:$LD_LIBRARY_PATH"
+# https://bugs.launchpad.net/byobu/+bug/1382598
+if [[ "$COLORTERM" == "gnome-terminal" ]] || [[ ${$(</proc/$PPID/cmdline):t} == gnome-terminal* ]]; then
+  export TERM="xterm-256color"
+fi
+
+# Search backwards and forwards with a pattern
+bindkey -M vicmd '/' history-incremental-pattern-search-backward
+bindkey -M vicmd '?' history-incremental-pattern-search-forward
+
+# set up for insert mode too
+bindkey -M viins '^R' history-incremental-pattern-search-backward
+bindkey -M viins '^F' history-incremental-pattern-search-forward
+
+function grt() {
+  echo $(git rev-parse --show-toplevel)
+}
+function G() {
+  cd $(grt)
+}
+
 export PATH="${PATH}:${HOME}/.local/bin"
 export LD_LIBRARY_PATH="${HOME}/NUMABin/share/elmersolver/lib:${LD_LIBRARY_PATH}:${HOME}/.local/lib"
 export PYTHONPATH="${HOME}/NUMABin/lib/python3.4/site-packages":"${HOME}/NUMABin/lib/python2.7/site-packages/":${PYTHONPATH}
